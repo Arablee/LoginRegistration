@@ -1,6 +1,9 @@
 const userRepository = require("../repository/userRepository")
 const winston = require("../logger/logger");
+const bcrypt = require("bcrypt");
+const { userRole } = require("../enums/enums");
 const ApiError = require("../exceptions/apiError");
+const tokenService = require("../services/tokenService")
 
 
 class userService {
@@ -34,7 +37,7 @@ class userService {
         if (password !== confirmPassword)
             throw ApiError.BadRequest("Şifrələrdə uyğunluq yoxdur");
         const hashPassword = await bcrypt.hash(password, 3);
-        const activationToken = tokenService.generateActivationToken(email);
+        //const activationToken = tokenService.generateActivationToken(email);
         const timeNow = Date.now();
         const role = await userRepository.findRole(userRole.USER);
         const user = await userRepository.createUser(
@@ -42,7 +45,7 @@ class userService {
             lastName,
             email,
             hashPassword,
-            activationToken,
+            //activationToken,
             role._id,
             timeNow,
             timeNow
@@ -76,10 +79,11 @@ class userService {
             winston.warn("userService.createPhone -- phone not created!");
             throw ApiError.GeneralException("Xəta baş verdi");
         }
+
         user.addresses.push(address);
         user.phones.push(phone);
         user.save();
-        const mailSender = await mailService.sendActivationMail(
+        /*const mailSender = await mailService.sendActivationMail(
             email,
             `${process.env.api_url}/api/user/activate/${activationToken}`
         );
@@ -90,9 +94,22 @@ class userService {
         return {
             user: userDto,
             message: `Təstiq mesajı ${email} ünvanına  göndərildi`,
-        };
+        };*/
     }
 
+
+    async rememberMe(email, password) {
+        winston.debug(`login.rememberMe - start`);
+        const token = await tokenService.generateRememberMeToken(email, password);
+        if (!token) {
+            winston.warn(
+                `login.rememberMe - generate token - ${JSON.stringify(token)}`
+            );
+            throw ApiError.GeneralException("Xəta baş verdi");
+        }
+        winston.debug(`login.rememberMe - success`);
+        return token;
+    }
 }
 
 module.exports = new userService();
