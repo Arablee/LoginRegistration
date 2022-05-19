@@ -13,7 +13,7 @@ class UserService{
             throw new Error("Şifrələr uyğun deyil!!!")
 
 
-        const saltRounds = 10;
+        const saltRounds = 3;
         const hashPassword = await bcrypt.hash(password, saltRounds)
 
         return await UserRepository.createUser(firstName, lastName, email, hashPassword);
@@ -23,14 +23,7 @@ class UserService{
         const isExist = await UserRepository.findByOneEmail(email)
         if(!isExist)
             throw new Error("Belə istifadəçi sistemde mövcud deyil. Zehmet olmasa qeydiyyatdan kecin!!!")
-
-        const saltRounds = 10;
-        const hashPassword = await bcrypt.hash(password, saltRounds)
-        const pass = UserRepository.findByOneEmail({email})
-
-        const passwordIsTrue = bcrypt.compare(hashPassword, pass.password)
-
-
+        const passwordIsTrue = await bcrypt.compare(password, isExist.password)
         if (!passwordIsTrue)
             return "Shifre yanlisdir!"
 

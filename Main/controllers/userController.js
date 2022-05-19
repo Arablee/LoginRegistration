@@ -22,6 +22,17 @@ class UserController{
 
         try{
             const user = await UserService.login(email, password);
+            const tokenData = await TokenService.generateTokens(user._id, email)
+            res.cookie("x-auth-access", tokenData.accessToken, {
+                maxAge: 30 * 24 * 60 * 60 * 1000,
+                httpOnly: true,
+            })
+            res.cookie("x-auth-refresh", tokenData.refreshToken, {
+                maxAge: 30 * 24 * 60 * 60 * 1000,
+                httpOnly: true,
+            })
+            delete tokenData.accessToken;
+            delete tokenData.refreshToken;
             res.status(200).json(user)
         }catch (error) {
             next(error)
