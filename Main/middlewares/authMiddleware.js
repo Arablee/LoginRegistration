@@ -7,8 +7,7 @@ const TokenService = require("../services/tokenService")
 const authMiddleware = async (req, res, next) => {
 
     try {
-        const accessToken = req.cookies["x-social-auth"]
-
+        const accessToken = req.cookies["x-auth-access"]
         const userData = await TokenService.validateAccessToken(accessToken);
         if (!userData)
             return next

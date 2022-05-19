@@ -38,6 +38,12 @@ class UserController{
             next(error)
         }
     }
+
+
+    async logout(req, res, next){
+        res.clearCookie("x-social-access");
+        res.clearCookie("x-social-refresh");
+    }
 }
 
 module.exports = new UserController();
