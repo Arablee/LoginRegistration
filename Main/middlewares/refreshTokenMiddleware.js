@@ -1,5 +1,7 @@
 require("dotenv").config()
 const userService = require("../services/userService")
+const ApiError = require("../exceptions/apiError")
+
 
     const refreshTokenMiddleware = async (req, res, next) => {
         try {
@@ -8,7 +10,7 @@ const userService = require("../services/userService")
             const refreshToken = req.cookies["x-auth-refresh"]
             const newUserData = await userService.refresh(refreshToken)
             if (!newUserData) {
-                return "User not found!"
+                throw ApiError.BadRequest("Resfresh melumat tapilmadi")
             }
 
             res.cookie("x-social-auth", newUserData.accessToken, {

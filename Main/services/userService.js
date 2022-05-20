@@ -1,6 +1,7 @@
 const UserRepository = require("../repository/userRepository")
 const bcrypt = require("bcrypt");
 const tokenService = require("../services/tokenService")
+const ApiError = require("../exceptions/apiError")
 
 class UserService{
 
@@ -8,10 +9,10 @@ class UserService{
 
         const candidate = await UserRepository.findByOneEmail(email);
         if(candidate)
-            throw new Error("Belə istifadəçi artıq mövcuddur!!!")
+            throw ApiError.BadRequest("Belə istifadəçi artıq mövcuddur!!!")
 
         if(password !== confirmPassword)
-            throw new Error("Şifrələr uyğun deyil!!!")
+            throw ApiError.BadRequest("Shifreler uygun deyil")
 
 
         const saltRounds = 3;
@@ -23,10 +24,10 @@ class UserService{
     async login(email, password){
         const isExist = await UserRepository.findByOneEmail(email)
         if(!isExist)
-            throw new Error("Belə istifadəçi sistemde mövcud deyil. Zehmet olmasa qeydiyyatdan kecin!!!")
+            throw ApiError.NotFoundException()
         const passwordIsTrue = await bcrypt.compare(password, isExist.password)
         if (!passwordIsTrue){
-            return "Shifre yanlisdir!"}
+            throw ApiError.BadRequest("Shifre yanlishdir")}
         return isExist;
     }
 
@@ -35,17 +36,17 @@ class UserService{
         const userData = await tokenService.validateRefreshToken(refreshToken);
 
         if (!userData) {
-            throw "xeta"
+            throw ApiError.UnauthorizedError();
         }
         const user = await UserRepository.getUserById(userData.id);
         if (!user) {
 
-            throw "xeta"
+            throw ApiError.UnauthorizedError();
         }
 
         const tokens = tokenService.generateTokens(user.email);
         if (!tokens) {
-            throw "xeta"
+            throw ApiError.UnauthorizedError();
         }
         // await tokenService.saveToken(userDto.id, tokens.refreshToken);
 
@@ -56,7 +57,7 @@ class UserService{
         try {
             const user = await tokenService.validateRefreshToken(refreshToken);
             if (!user) {
-                return "User not found!";
+                throw ApiError.NotFoundException("Istifadechi tapilmadi");
             }
             await tokenService.removeRefreshToken(user.userID);
         } catch (error) {

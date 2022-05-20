@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config()
 const refreshTokenModel = require("../models/refreshTokenModel")
+const ApiError = require("../exceptions/apiError")
 
 
 
@@ -8,7 +9,7 @@ class TokenService{
 
     async generateTokens(email){
         if (!email){
-            throw new Error("ID ve ya Email tapilmadi")
+            throw ApiError.BadRequest("Email tapilmadi")
         }
         try {
             const accessToken = jwt.sign({email}, process.env.JWT_USER_SECRET, {
@@ -26,7 +27,7 @@ class TokenService{
 
     async validateAccessToken(accessToken){
         if(!accessToken){
-            throw new Error("Xeta")
+            throw ApiError.BadRequest("Access token tapilamdi")
         }
         try{
             const user = jwt.verify(accessToken, process.env.JWT_USER_SECRET)
@@ -39,9 +40,8 @@ class TokenService{
     async validateRefreshToken(refreshToken){
 
         if(!refreshToken){
-            throw new Error("Xeta")
+            throw ApiError.BadRequest("Refresh token tapilmadi")
         }
-
         try{
             const user = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET)
             return user;
