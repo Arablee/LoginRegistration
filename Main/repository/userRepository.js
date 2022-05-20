@@ -6,8 +6,7 @@ class UserRepository {
 
     async findByOneEmail(email){
 
-        const user = await UserModel.findOne({email});
-
+        const user = await UserModel.findOne({email: email});
         try{
             return user;
         }catch (e) {
@@ -22,6 +21,13 @@ class UserRepository {
 
     }
 
+    async getUserById(id){
+        try {
+            return await UserModel.findById(id);
+        } catch (error) {
+            throw error;
+        }
+    }
 
 }
 

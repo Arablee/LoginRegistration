@@ -10,7 +10,7 @@ const authMiddleware = async (req, res, next) => {
         const accessToken = req.cookies["x-auth-access"]
         const userData = await TokenService.validateAccessToken(accessToken);
         if (!userData)
-            return next
+            return next()
         req.user = userData
         next()
     }catch (e) {

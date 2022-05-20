@@ -21,8 +21,10 @@ class UserController{
         const {email, password} = req.body
 
         try{
+
             const user = await UserService.login(email, password);
-            const tokenData = await TokenService.generateTokens(user._id, email)
+            const tokenData = await TokenService.generateTokens(email)
+            await TokenService.saveRefreshToken(tokenData.refreshToken, user.id)
             res.cookie("x-auth-access", tokenData.accessToken, {
                 maxAge: 30 * 24 * 60 * 60 * 1000,
                 httpOnly: true,
@@ -31,8 +33,6 @@ class UserController{
                 maxAge: 30 * 24 * 60 * 60 * 1000,
                 httpOnly: true,
             })
-            delete tokenData.accessToken;
-            delete tokenData.refreshToken;
             res.status(200).json(user)
         }catch (error) {
             next(error)
@@ -41,8 +41,18 @@ class UserController{
 
 
     async logout(req, res, next){
-        res.clearCookie("x-social-access");
-        res.clearCookie("x-social-refresh");
+        try {
+            const refreshToken = req.cookies["x-auth-refresh"];
+
+            await UserService.logout(refreshToken);
+
+            res.clearCookie("x-auth-access");
+            res.clearCookie("x-auth-refresh");
+
+            res.status(200).send("User logged out successfully!");
+        }catch (e) {
+            next(e)
+        }
     }
 }
 

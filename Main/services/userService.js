@@ -1,5 +1,6 @@
 const UserRepository = require("../repository/userRepository")
 const bcrypt = require("bcrypt");
+const tokenService = require("../services/tokenService")
 
 class UserService{
 
@@ -24,10 +25,43 @@ class UserService{
         if(!isExist)
             throw new Error("Belə istifadəçi sistemde mövcud deyil. Zehmet olmasa qeydiyyatdan kecin!!!")
         const passwordIsTrue = await bcrypt.compare(password, isExist.password)
-        if (!passwordIsTrue)
-            return "Shifre yanlisdir!"
-
+        if (!passwordIsTrue){
+            return "Shifre yanlisdir!"}
         return isExist;
+    }
+
+    async refresh(refreshToken) {
+
+        const userData = await tokenService.validateRefreshToken(refreshToken);
+
+        if (!userData) {
+            throw "xeta"
+        }
+        const user = await UserRepository.getUserById(userData.id);
+        if (!user) {
+
+            throw "xeta"
+        }
+
+        const tokens = tokenService.generateTokens(user.email);
+        if (!tokens) {
+            throw "xeta"
+        }
+        // await tokenService.saveToken(userDto.id, tokens.refreshToken);
+
+        return { ...tokens, user};
+    }
+
+    async logout(refreshToken) {
+        try {
+            const user = await tokenService.validateRefreshToken(refreshToken);
+            if (!user) {
+                return "User not found!";
+            }
+            await tokenService.removeRefreshToken(user.userID);
+        } catch (error) {
+            throw error;
+        }
     }
 }
 
