@@ -21,10 +21,9 @@ class UserController{
         const {email, password} = req.body
 
         try{
-
             const user = await UserService.login(email, password);
             const tokenData = await TokenService.generateTokens(email)
-            await TokenService.saveRefreshToken(tokenData.refreshToken, user.id)
+            await TokenService.saveRefreshToken(user.id, tokenData.refreshToken)
             res.cookie("x-auth-access", tokenData.accessToken, {
                 maxAge: 30 * 24 * 60 * 60 * 1000,
                 httpOnly: true,

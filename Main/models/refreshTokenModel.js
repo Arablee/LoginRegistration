@@ -2,13 +2,12 @@ const {Schema, model} = require("mongoose");
 
 
 const schema = new Schema({
-
-    refreshToken:{
-        type: String
-    },
-    userID: {
+    userId: {
         type: Schema.Types.ObjectId,
         ref: "User",
+    },
+    refreshToken:{
+        type: String
     }
 })
 

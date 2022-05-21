@@ -28,7 +28,6 @@ class UserRepository {
             throw error;
         }
     }
-
 }
 
 module.exports = new UserRepository();

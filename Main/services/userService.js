@@ -32,15 +32,12 @@ class UserService{
     }
 
     async refresh(refreshToken) {
-
         const userData = await tokenService.validateRefreshToken(refreshToken);
-
         if (!userData) {
             throw ApiError.UnauthorizedError();
         }
         const user = await UserRepository.getUserById(userData.id);
         if (!user) {
-
             throw ApiError.UnauthorizedError();
         }
 

@@ -46,19 +46,18 @@ class TokenService{
             const user = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET)
             return user;
         }catch (e) {
-            throw e;
+            throw null;
         }
     }
 
-    async saveRefreshToken(id, refreshToken){
+    async saveRefreshToken(userId, refreshToken){
         try {
-            console.log(refreshToken)
-            const saveToken = await refreshTokenModel.create({refreshToken, id})
-            return saveToken;
+            return await refreshTokenModel.create({userId: userId, refreshToken: refreshToken});
         }catch (e) {
             throw e;
         }
     }
+
     async removeRefreshToken(userID){
         try {
             return await refreshTokenModel.deleteOne({ userID });
