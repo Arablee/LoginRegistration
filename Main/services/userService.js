@@ -62,10 +62,11 @@ class UserService{
         }
     }
 
-    async updateUserPassword(id, oldPassword, newPassword, confirmNewPassword){
+    async updateUserPassword(email, oldPassword, newPassword, confirmNewPassword){
         try {
 
-            const user = UserRepository.getUserById(id);
+            const user = await UserRepository.findByOneEmail(email);
+            console.log(user)
             if(!user){
                 throw ApiError.NotFoundException("User not found");
             }
@@ -75,10 +76,16 @@ class UserService{
             if (newPassword !== confirmNewPassword){
                 throw ApiError.BadRequest("Passwords mismatch!!!")
             }
+            const passwordIsTrue = await bcrypt.compare(oldPassword, user.password)
+            if (!passwordIsTrue){
+                throw ApiError.BadRequest("Kohne shifre yanlishdir")}
+
+
+
             const saltRounds = 3;
             const hashPassword = await bcrypt.hash(newPassword, saltRounds)
 
-            const updatedUser = await UserRepository.findUserByIdAndUpdatePassword(id, hashPassword)
+            const updatedUser = await UserRepository.findUserByIdAndUpdatePassword(email, hashPassword)
 
             return updatedUser;
         }catch (e){

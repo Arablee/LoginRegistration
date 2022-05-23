@@ -7,4 +7,6 @@ router.route("/signup").post(UserValidator.register,  UserController.registratio
 router.route("/login").post(UserController.login);
 router.route("/logout").get(UserController.logout);
 
+
+
 module.exports = router;

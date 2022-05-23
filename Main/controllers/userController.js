@@ -24,6 +24,7 @@ class UserController{
             const user = await UserService.login(email, password);
             const tokenData = await TokenService.generateTokens(email)
             await TokenService.saveRefreshToken(user.id, tokenData.refreshToken)
+            req.user = user
             res.cookie("x-auth-access", tokenData.accessToken, {
                 maxAge: 30 * 24 * 60 * 60 * 1000,
                 httpOnly: true,
@@ -58,8 +59,8 @@ class UserController{
 
         try {
             const {oldPassword, newPassword, confirmNewPassword} = req.body
-            const { id } = req.params;
-            await UserService.updateUserPassword(id, oldPassword, newPassword, confirmNewPassword);
+            const email = req.user.email
+            await UserService.updateUserPassword(email, oldPassword, newPassword, confirmNewPassword);
             res.status(200).send("Password successfully changed")
         }catch (e) {
             next(e)

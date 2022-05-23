@@ -12,6 +12,7 @@ const authMiddleware = async (req, res, next) => {
         if (!userData)
             return next()
         req.user = userData
+
         next()
     }catch (e) {
         next();
