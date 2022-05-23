@@ -56,7 +56,6 @@ class UserController{
     }
 
     async updateUserPassword(req, res, next){
-
         try {
             const {oldPassword, newPassword, confirmNewPassword} = req.body
             const email = req.user.email
@@ -66,6 +65,17 @@ class UserController{
             next(e)
         }
     }
+
+    async resetPassword(req, res, next){
+        try {
+            Math.floor(100000 + Math.random() * 900000);
+
+        }catch (e){
+            next(e);
+        }
+
+    }
+
 }
 
 module.exports = new UserController();

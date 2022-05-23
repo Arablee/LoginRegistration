@@ -64,7 +64,9 @@ class UserService{
 
     async updateUserPassword(email, oldPassword, newPassword, confirmNewPassword){
         try {
-
+            if (!oldPassword || !newPassword || !confirmNewPassword) {
+                throw ApiError.BadRequest("Please fill all fields!");
+            }
             const user = await UserRepository.findByOneEmail(email);
             console.log(user)
             if(!user){
