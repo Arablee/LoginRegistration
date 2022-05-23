@@ -4,7 +4,7 @@ const RefreshTokenMiddleware = require("../../middlewares/refreshTokenMiddleware
 const UserController = require("../../controllers/userController");
 
 
-router.use(AuthMiddleware)
+router.use(AuthMiddleware, RefreshTokenMiddleware)
 
 router.post('/change-password', UserController.updateUserPassword)
 

@@ -32,7 +32,6 @@ class UserRepository {
     async findUserByIdAndUpdatePassword(email, hashPassword){
         try {
             const user = await UserModel.findOne({email: email});
-            console.log(user._id)
             return await UserModel.findByIdAndUpdate(user._id, {password: hashPassword})
         }catch (e){
             throw e
