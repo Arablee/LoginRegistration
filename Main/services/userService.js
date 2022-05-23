@@ -61,6 +61,31 @@ class UserService{
             throw error;
         }
     }
+
+    async updateUserPassword(id, oldPassword, newPassword, confirmNewPassword){
+        try {
+
+            const user = UserRepository.getUserById(id);
+            if(!user){
+                throw ApiError.NotFoundException("User not found");
+            }
+            if(oldPassword === newPassword){
+                throw ApiError.BadRequest("Old and new passwords are the same!!!")
+            }
+            if (newPassword !== confirmNewPassword){
+                throw ApiError.BadRequest("Passwords mismatch!!!")
+            }
+            const saltRounds = 3;
+            const hashPassword = await bcrypt.hash(newPassword, saltRounds)
+
+            const updatedUser = await UserRepository.findUserByIdAndUpdatePassword(id, hashPassword)
+
+            return updatedUser;
+        }catch (e){
+            throw e
+        }
+    }
+
 }
 
 module.exports = new UserService();

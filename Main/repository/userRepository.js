@@ -28,6 +28,14 @@ class UserRepository {
             throw error;
         }
     }
+
+    async findUserByIdAndUpdatePassword(id, hashPassword){
+        try {
+            return await UserModel.findByIdAndUpdate(id, {password: hashPassword})
+        }catch (e){
+            throw e
+        }
+    }
 }
 
 module.exports = new UserRepository();
